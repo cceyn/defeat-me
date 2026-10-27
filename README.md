@@ -54,7 +54,7 @@ Once installed, the skills are available to Copilot and may be selected when rel
 
 ### Other compatible agents
 
-The three skills use the portable Agent Skills format. Other compatible agents can use them if they support skills and discover or are configured to load the repository's `skills/` directory. Supported locations and installation steps vary by agent; consult that agent's documentation.
+The three skills, use the portable Agent Skills format. Other compatible agents can use them if they support skills and discover or are configured to load the repository's `skills/` directory. Supported locations and installation steps vary by agent; consult that agent's documentation.
 
 ## Project contents
 
