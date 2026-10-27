@@ -1,43 +1,68 @@
 ---
 name: defeat-scope
-description: Keep code changes limited to the requested task and report every touched file. Use before editing, while handling requests that could invite refactoring, and during final diff review.
+description: "Keep code changes limited to the requested work and account for every file changed. Use before editing an existing project, when a request invites adjacent cleanup, and during final diff review."
 ---
 
 # Defeat Scope
 
-Change only what the user asked for and the smallest directly necessary supporting work. Keep the diff easy to review. Do not use a task as permission to refactor nearby code or edit unrelated files.
+The request defines the boundary. Do the smallest complete piece of work that meets it, preserve changes already in the working tree, and make any necessary scope expansion visible before it grows.
 
-## Procedure
+## Use this skill for
 
-1. **Establish the requested boundary.**
-   - Restate the requested outcome internally as concrete behavior or files.
-   - Inspect the relevant code and instructions only far enough to identify the smallest complete change.
-   - Check the working tree and preserve pre-existing user changes.
+- Code changes in an existing repository, especially one with uncommitted work.
+- Requests that could tempt broad cleanup, redesign, or refactoring.
+- Reviewing a diff or preparing a file-by-file change summary.
 
-2. **Plan the smallest complete diff.**
-   - Include tests or documentation only when directly needed to implement or explain the requested behavior.
-   - Reuse existing patterns and helpers. Do not rename, reformat, reorganize, or modernize unrelated code.
-   - If a necessary fix crosses the apparent boundary, explain why it is required. Ask before expanding into a significant or ambiguous scope.
+## Workflow
 
-3. **Make focused edits.**
-   - Avoid unrelated cleanup, dependency changes, generated artifacts, and edits to files the user did not ask to change.
-   - Do not overwrite or revert existing changes. If an existing edit conflicts with the task, stop and ask how to proceed.
+### 1. Set the boundary before editing
 
-4. **Audit the diff before finishing.**
-   - Review changed paths and the final diff.
-   - Revert only accidental edits that you made during this task; never discard pre-existing changes.
-   - If any change extends beyond the requested scope, identify it and explain why it was necessary. Do not hide scope expansion.
+1. Translate the request into the specific behavior or outcome it asks for.
+2. Read the relevant code and project instructions far enough to identify what must change.
+3. Check the working-tree status and inspect existing edits in files you may touch.
+4. Keep a clear distinction between the user's existing work and changes made for this request. Do not overwrite, stage, revert, or “clean up” changes you did not make.
 
-5. **Report exactly what changed.**
-   - List each file you changed and a short reason.
-   - Explicitly state whether any work went beyond the request and why. If none did, say so.
+### 2. Choose the smallest complete change
+
+- Change only what is needed to deliver the requested behavior.
+- Add or update a test or documentation when it directly supports the requested change.
+- Follow the nearby code's conventions; avoid drive-by formatting, renaming, dependency changes, or modernization.
+- Do not modify unrelated files just because an issue is visible nearby. Mention unrelated findings separately when useful.
+- If a supporting change is necessary, keep it narrowly tied to the request and be ready to explain why.
+
+If completing the task appears to require a substantial change outside the original boundary, stop before making that expansion. Briefly explain the dependency and ask the user to choose whether to include it or keep the scope narrow.
+
+### 3. Keep the diff accountable
+
+Before finishing:
+
+1. Review the diff, not just the files you remember editing.
+2. Check for accidental changes, generated files, unrelated formatting, and missing parts of the request.
+3. Check the final working-tree status. Do not imply the worktree is clean if user changes remain.
+4. Identify every file changed for this task and why it changed.
+
+If you spot an accidental edit of your own, undo only that edit. Never use a broad restore or reset that might erase someone else's work.
+
+### 4. Report the scope
+
+End with a direct summary, for example:
+
+```text
+Changed:
+- `src/validate.ts` — reject the invalid value requested.
+- `src/validate.test.ts` — cover the regression.
+
+Out of scope: No unrelated files or refactors.
+```
+
+List the actual paths and reasons. If work had to extend beyond the request, name those files and explain why; do not hide scope expansion in a general summary.
 
 ## Example
 
 **Before**
 
-> I fixed the requested validation and also reformatted the surrounding module.
+> I fixed validation and reformatted the module while I was there.
 
 **After**
 
-> Changed `src/validate.ts` to reject the reported invalid input and `src/validate.test.ts` to cover it. No unrelated refactoring or files changed.
+> Changed `src/validate.ts` for the requested validation and `src/validate.test.ts` for its regression test. Left the surrounding formatting and unrelated files unchanged.

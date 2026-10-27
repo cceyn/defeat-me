@@ -1,43 +1,75 @@
 ---
 name: defeat-hallucinations
-description: Verify that a package, symbol, method, or API exists in the project's actual dependency version before using it. Use when adding dependencies or relying on unfamiliar or version-sensitive APIs.
+description: "Check that a package, dependency, symbol, method, or API exists and matches the project's actual version before using it. Use when adding dependencies, writing unfamiliar integrations, or relying on version-sensitive behavior."
 ---
 
 # Defeat Hallucinations
 
-Do not rely on memory alone for package names, exported symbols, method signatures, or API behavior. Verify each unfamiliar dependency or API against the version this project actually uses before writing code that depends on it.
+Names and examples found in memory are leads, not proof. Before depending on an unfamiliar package or API, verify what the project has installed and what that exact version supports. If you cannot confirm it, pause and tell the user what remains unknown.
 
-## Procedure
+## Use this skill for
 
-1. **Identify the exact dependency and version.**
-   - Inspect the relevant manifest and lockfile. Account for workspace configuration, aliases, optional dependencies, and the package manager in use.
-   - For an already installed package, inspect the installed package metadata and source or type declarations. Do not infer the installed version from a version range alone.
+- Adding, replacing, or upgrading a dependency.
+- Using an unfamiliar package, export, method, command, or configuration field.
+- Checking whether an API example applies to the project's installed version.
+- Investigating a suspected package-name typo, lookalike, or unexpected publisher.
 
-2. **Verify the package name before suggesting installation.**
-   - Confirm the exact package name in a trusted, official registry or the package's official project documentation.
-   - Check that the publisher and package purpose match the intended dependency. Treat unfamiliar, lookalike, newly appearing, or oddly named packages as unverified until confirmed.
-   - Never install a package whose name you have not verified. If verification is inconclusive, tell the user what remains uncertain and propose a safe check instead.
+Routine use of a well-understood API already established in the current code may not need a separate investigation.
 
-3. **Verify each unfamiliar API against the installed version.**
-   - Search the installed package's exports, implementation, and type declarations for the symbol and signature.
-   - Check the official documentation for that same released version, not only a latest-version guide or an unverified example.
-   - Confirm the API's parameters, return type, availability, and relevant error behavior. For platform- or runtime-dependent APIs, verify the project's supported runtime as well.
+## Workflow
 
-4. **Resolve conflicting evidence conservatively.**
-   - Prefer the installed code and type declarations for what is available locally; use official versioned documentation to confirm intended behavior.
-   - If the documentation, installed version, and lockfile do not agree, report the discrepancy and do not write code as if the API were confirmed.
-   - Do not silently upgrade a dependency to make an assumed API appear available. Ask for approval if a dependency change is needed.
+### 1. Establish the project's version
 
-5. **Record the verification briefly.**
-   - State which version and source you checked.
-   - If the symbol or package could not be verified, label it unverified and give the next concrete verification step.
+1. Identify the relevant package manager and workspace.
+2. Read the dependency manifest and lockfile. Account for aliases, overrides, optional dependencies, workspace packages, and version ranges where relevant.
+3. If the dependency is installed, inspect its own package metadata to establish the actual version. A version range in a manifest does not prove which version is installed.
+4. If the package or API is not present locally, do not write code as though it has been confirmed.
+
+### 2. Verify a package before adding it
+
+1. Confirm the exact package name in the package manager's configured registry or the project's official documentation.
+2. Check that the publisher and stated purpose match the dependency you intend to use. Treat a plausible-looking spelling as unverified until checked.
+3. Confirm the package's official installation instructions and that it supports the project's runtime and package manager.
+4. Do not install an unverified package. If the identity, publisher, or purpose is unclear, stop before changing the manifest or lockfile and explain the concern.
+
+Do not treat a search result, copied snippet, or registry name alone as proof that a package is the intended dependency.
+
+### 3. Verify an API in the version this project uses
+
+1. Search the installed package's exports, implementation, and type declarations for the exact symbol and signature.
+2. Check the official documentation for the same released version. Use versioned docs or release notes where available; a “latest” page may describe a different API.
+3. Confirm the details the change relies on: parameters, return values, errors, availability, and runtime or platform constraints.
+4. Compare the documentation with the installed source or types. If they disagree, trust neither silently: report the mismatch and do not code against an assumed behavior.
+
+For a standard-library or platform API, verify it in the project's supported runtime documentation and version rather than looking for a package.
+
+### 4. Handle missing evidence honestly
+
+If network access, the registry, official docs, or installed sources are unavailable:
+
+- State which source could not be checked.
+- Separate what the local manifest or lockfile proves from what is still unknown.
+- Do not install a substitute or silently upgrade dependencies to make an example fit.
+- Offer a concrete next step, such as checking the configured registry, installing from a verified source with approval, or using an API already present in the project.
+
+Ask before making a dependency or version change that is not already part of the request.
+
+### 5. Leave a concise verification note
+
+When verification affects the implementation, report:
+
+- The exact package and version checked, if applicable.
+- The source checked (for example installed type declarations, lockfile, or versioned official docs).
+- What was confirmed and any unresolved discrepancy.
+
+Do not claim an API is verified just because the code compiles; compilation does not establish package identity or all runtime behavior.
 
 ## Example
 
 **Before**
 
-> I'll install the unfamiliar package and use its API from memory; it should exist.
+> I'll install this unfamiliar package and use `parseAsync`; that looks like the right API.
 
 **After**
 
-> I could not verify the package name or API against the configured registry, the installed dependency set, or an official source, so I did not install or use it. I can verify the intended package or use an already-installed alternative.
+> I could not verify the package's exact name or API in the configured registry or an official source, so I did not install it. I can check the intended package name with you or use a parser already present in the lockfile.

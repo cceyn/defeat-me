@@ -1,51 +1,86 @@
 ---
 name: defeat-done
-description: Require verifiable evidence before reporting a coding task as complete. Use after implementing a change, fixing a bug, or preparing a completion summary.
+description: "Prove a code change before calling it done. Use after implementing a feature or bug fix, when asked to run tests or review a change, or before writing a completion report."
 ---
 
 # Defeat Done
 
-Do not report a coding task as complete until you have tried to verify the change with the project's tests, build, and linter. Then challenge your own solution with relevant edge cases and failure paths. Report commands and results accurately; never imply that an unrun check passed.
+Treat “done” as a claim that needs evidence. Run the checks this project actually provides, inspect the change for ways it could fail, and report what happened. Do not turn an attempted check into a passing result.
 
-## Procedure
+## Use this skill for
 
-1. **Inspect the project before choosing commands.**
-   - Read the repository's contributor instructions, package manifests, lockfiles, scripts, and CI workflows.
-   - Identify the project's documented test, build, and lint commands. Use the repository's existing package manager and scripts; do not install dependencies unless required by the task and approved by the project's conventions.
-   - Check the working tree before changing anything so existing user changes are preserved.
+- New features, bug fixes, refactors, and other code changes.
+- Requests to test, validate, review, or confirm that a change works.
+- The final check before reporting implementation work as complete.
 
-2. **For a bug fix, prove the failure first.**
-   - Add or update a focused regression test that expresses the reported bug.
-   - Run that test before the fix and show that it fails for the expected reason. If it does not fail, revise the test or explain why reproducing the failure is not possible before proceeding.
-   - Make the smallest fix that addresses the reproduced failure.
+For a question or documentation-only edit with no behavior to verify, use the relevant lightweight checks rather than inventing tests.
 
-3. **Run the project's verification commands after the change.**
-   - Execute the relevant tests, build, and linter as separate, identifiable commands. Do not substitute reading source code or relying on a previous run for actually executing them.
-   - For a bug fix, rerun the regression test and confirm it passes.
-   - If a command is absent, determine whether the project documents an equivalent check. Do not invent a successful result for a missing command.
-   - Preserve and report the actual command, exit result, and relevant output. If a command cannot run because of missing tools, dependencies, permissions, or environment, state the blocker and mark that check unverified.
+## Workflow
 
-4. **Try to break the change.**
-   - Exercise boundary values, empty and malformed inputs, expected failures, and relevant state transitions.
-   - Check for unintended side effects in nearby callers, interfaces, persisted data, and platform-specific behavior.
-   - Add or run focused tests for meaningful risks. Fix any issue found, then rerun the affected checks.
+### 1. Find the project's real checks
 
-5. **Review the final diff.**
-   - Confirm the change does what was requested and does not introduce unrelated behavior.
-   - Review `git diff` and the working-tree status for accidental edits, generated files, or missing changes.
+1. Read the relevant project instructions and identify the files and behavior changed.
+2. Inspect the project's manifests, scripts, contributor docs, and CI configuration for its test, build, and lint commands. Follow the package manager and commands the project already uses.
+3. Check the working tree before editing. Keep existing user changes separate from your own.
+4. Choose checks that cover this change. Run the project's test suite, build, and linter when they exist and apply. Do not assume a command from another project or add a tool just to make a check appear available.
 
-6. **Give an evidence-based completion report.**
-   - List the checks that actually ran, their exact commands, and pass/fail results.
-   - Include concise relevant output, such as a test summary or build/lint success line; do not claim output you did not observe.
-   - List checks not run and why, plus any remaining risks.
-   - Only call the task complete when the requested work is done and the verification status is explicit. Never use "should work" as a substitute for a check.
+If a check is missing, explain how you established that and report it as unavailable or not applicable. Do not quietly omit it or describe it as passing.
+
+### 2. Make bug fixes testable
+
+For a reported bug, write or update a focused regression test before changing the implementation.
+
+1. Run the test against the unfixed code.
+2. Confirm it fails for the reported behavior, not because of a broken test, setup error, or unrelated failure.
+3. Make the smallest fix that addresses the reproduced failure.
+4. Run the regression test again and confirm it passes.
+
+If the test cannot be run or does not reproduce the bug, say why. Do not claim a red-green proof you did not observe.
+
+For work that is not a bug fix, add or update tests where they provide meaningful coverage; do not manufacture a regression scenario.
+
+### 3. Run checks and keep their evidence
+
+Run each relevant check after the final code change. Use identifiable commands and inspect their exit status and output. If a fix made after a failure changes the code, rerun the affected checks.
+
+- Report the command actually used, whether it passed or failed, and a concise result.
+- If a command fails, include the useful failure and whether it is related to this change.
+- If a command cannot run because a tool, dependency, permission, or environment is missing, name that blocker and mark the check unverified.
+- Do not infer success from a command starting, a previous run, source inspection, or an agent's expectation.
+- Do not paste huge logs; provide the relevant summary and enough context to identify the result.
+
+### 4. Try to break the changed behavior
+
+Review the final diff with the behavior in mind. Probe plausible failure cases for the code you changed, for example:
+
+- Empty, boundary, malformed, or unexpected input.
+- Error returns, exceptions, timeouts, and unavailable dependencies.
+- Repeated calls, state changes, or cleanup paths.
+- Effects on nearby callers, interfaces, persisted data, and platform-specific behavior.
+
+Choose cases that make sense for this change; do not claim to have tested cases you only considered. Use focused tests or safe manual checks where appropriate. Fix issues you find and rerun affected checks.
+
+### 5. Report the result plainly
+
+Before calling the task complete, review the diff and working-tree status. Then give a short evidence report:
+
+```text
+Changed: <behavior or files>
+Checks:
+- `<exact command>` — passed/failed; <brief result>
+- `<exact command>` — not run; <reason>
+Regression test: <failed before the fix and passed after, or not applicable>
+Remaining: <unverified checks or known risks, or none>
+```
+
+Use only the lines that apply. If a required check failed or could not run, state that plainly and do not present the change as fully verified. Never use “should work” as a substitute for results.
 
 ## Example
 
 **Before**
 
-> Fixed the parser; it should work now.
+> Fixed the parser. It should work now.
 
 **After**
 
-> Fixed the parser's empty-input case. `npm test -- --runInBand` - passed (18 tests); `npm run build` - passed; `npm run lint` - not run (the project has no lint script). Added a regression test that failed before the fix and passes now. Remaining: lint is unverified.
+> Fixed the parser's empty-input case. `npm test -- --runInBand` passed (18 tests); the new regression test failed before the fix and passes now. `npm run build` passed. No lint script is defined in this project, so lint remains unverified.
