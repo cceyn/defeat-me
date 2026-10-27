@@ -1,4 +1,4 @@
-# defeat-me skill
+# defeat-me
 
 ![Defeat Me - Make your agent prove its work](defeatme.png)
 
@@ -56,23 +56,6 @@ Once installed, the skills are available to Copilot and may be selected when rel
 
 The three skills use the portable Agent Skills format. Other compatible agents can use them if they support skills and discover or are configured to load the repository's `skills/` directory. Supported locations and installation steps vary by agent; consult that agent's documentation.
 
-## Optional Copilot completion hook
-
-The plugin includes a Copilot-specific hook. It is separate from the portable skills and is **off unless a project explicitly enables it**. VS Code documents agent hooks as Preview.
-
-To enable it for a project, create `.defeat-me.json` in that project's root and provide its actual test command:
-
-```json
-{
-  "enabled": true,
-  "testCommand": "npm test"
-}
-```
-
-At each main-agent completion attempt, the hook runs the configured `testCommand` through the platform shell from the project root. A non-zero exit, invalid configuration, or inability to start the command blocks that attempt and reports an error, plus up to the last 6,000 characters of combined output on failure. The command has a 110-second timeout; the hook has a 120-second timeout. The configured command runs with the Copilot process's permissions and environment, so only enable it for a project you trust.
-
-The hook requires Node.js available as `node`. It runs `node "${PLUGIN_ROOT}/scripts/verify-tests.cjs"`; the verifier reads the hook event from standard input and `.defeat-me.json` from the current project root. It does not install dependencies, inspect package manifests, or guess a test framework. To disable the check, change `"enabled": true` to `"enabled": false` in `.defeat-me.json`. See the [Copilot hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference) and [the verifier source](scripts/verify-tests.cjs).
-
 ## Project contents
 
 ```text
@@ -82,7 +65,7 @@ skills/
   defeat-scope/SKILL.md
 ```
 
-The repository also contains the plugin manifest and optional Copilot hook. `.github/` holds GitHub issue and pull request templates; those are repository-maintenance files, not installable skills.
+The repository also includes a plugin manifest for plugin-based installation. `.github/` contains GitHub issue and pull request templates; these are repository-maintenance files, not skills.
 
 ## Contributing
 

@@ -15,21 +15,14 @@ Thanks for helping make agent work more verifiable. Keep contributions focused, 
 - Follow the Agent Skills `SKILL.md` format: a directory-matching lowercase name and a clear description of what the skill does and when to use it.
 - Give agents concrete, ordered steps and explicitly say what to do when verification is not possible.
 - Include a concise before/after example.
-- Keep portable instructions under `skills/`. Place Copilot-only behavior under `com.github.copilot/`.
-
-## Hook changes
-
-- Hooks run commands on users' machines. Explain exactly what is executed, which files are read, and how to disable the behavior.
-- Keep hooks small and avoid network access, dependency installation, fixed project paths, or implicit framework detection.
-- Use only documented Copilot hook events and output fields. Validate behavior on supported operating systems when practical.
+- Keep the skills portable and avoid assuming a specific agent or project setup.
 
 ## Validation
 
 Before submitting, run the checks relevant to your change:
 
 - Parse every JSON file.
-- Check the plugin manifest, Skills layout, frontmatter, and hook configuration against their official formats.
-- Exercise changes to the hook in a small temporary project, including disabled, passing, failing, and invalid-configuration cases.
+- Check the plugin manifest, Skills layout, and frontmatter against their official formats.
 - Review the complete diff and ensure no generated artifacts, credentials, or personal data are included.
 
 Include the commands you ran and their results in the pull request. Be explicit about checks you could not run.
