@@ -1,4 +1,4 @@
-# defeat-me
+# defeat-me skill
 
 ![Defeat Me - Make your agent prove its work](defeatme.png)
 
