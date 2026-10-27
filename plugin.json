@@ -1,0 +1,14 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "defeat-me",
+  "version": "0.1.0",
+  "description": "Portable agent skills that make coding agents prove their work before declaring it done.",
+  "license": "MIT",
+  "keywords": [
+    "github-copilot",
+    "ai-agents",
+    "agent-skills",
+    "developer-tools",
+    "verification"
+  ]
+}

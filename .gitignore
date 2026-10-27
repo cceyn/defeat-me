@@ -1,0 +1,22 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+build/
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.*
+
+# Operating systems and editors
+.DS_Store
+Thumbs.db
+.vscode/
